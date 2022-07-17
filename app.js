@@ -18,27 +18,17 @@ const gameBoard = (() => {
         current: '',
         currentValue: ''
     };
+
     let _layout = [
         [0, 0, 0],
         [0, 0, 0],
         [0, 0, 0],
     ];
+
     const _logger = () => {
         console.table(_layout)
     };
 
-    const addMarker = function(location) {
-        if (gameState.playerTurnCheck() === 'playerOne') { 
-            _markers.current = _markers.x;
-            _markers.currentValue = _markers.xValue;
-        } else {
-            _markers.current = _markers.o;
-            _markers.currentValue = _markers.oValue;
-        }
-        _markerLocations[location](_markers.currentValue); 
-        gameState.playerSwitch(gameState.playerTurnCheck());
-        _logger();
-    };
     // object serves as key for placing marker on square and calls score check on intersecting patterns
     const _markerLocations = {
         tl: (value) => {
@@ -90,11 +80,11 @@ const gameBoard = (() => {
         },
         bl: (value) => {
             _layout[2][0] = value;
-            gameState.scoreCheck(
-                [gameState.calcPatterns.bottomRow, 
+            gameState.scoreCheck([
+                gameState.calcPatterns.bottomRow, 
                 gameState.calcPatterns.leftCol, 
-                gameState.calcPatterns.rtlDiag]
-            );
+                gameState.calcPatterns.rtlDiag
+            ]);
         },
         bc: (value) => {
             _layout[2][1] = value;
@@ -112,6 +102,20 @@ const gameBoard = (() => {
             ]);
         }
     };
+
+    const addMarker = function(location) {
+        if (gameState.playerTurnCheck() === 'playerOne') { // checks current player to assign correct mark
+            _markers.current = _markers.x;
+            _markers.currentValue = _markers.xValue;
+        } else {
+            _markers.current = _markers.o;
+            _markers.currentValue = _markers.oValue;
+        }
+        _markerLocations[location](_markers.currentValue); // updates value of chosen location
+        gameState.playerSwitch(gameState.playerTurnCheck());
+        _logger();
+    };
+
     const layoutCheck = () => _layout;
 
     return {
@@ -123,9 +127,8 @@ const gameBoard = (() => {
 const gameState = (() => {
     let _playerTurn = 'playerOne';
     const _gameOver = (player) => player === 'playerOne' ? alert('playerOne Wins!') : alert('playerTwo Wins!')
-    const playerTurnCheck = () => _playerTurn
     const playerSwitch = (player) => player === 'playerOne' ? _playerTurn = 'playerTwo' : _playerTurn = 'playerOne';
-    
+
     // object calculates patterns on board for scoreCheck function
     const calcPatterns = {
         topRow: () => gameBoard.layoutCheck()[0].reduce((pre, curr) => pre + curr, 0), 
@@ -137,6 +140,8 @@ const gameState = (() => {
         ltrDiag: () => gameBoard.layoutCheck()[0][0] + gameBoard.layoutCheck()[1][1] + gameBoard.layoutCheck()[2][2],
         rtlDiag: () => gameBoard.layoutCheck()[0][2] + gameBoard.layoutCheck()[1][1] + gameBoard.layoutCheck()[2][0]
     };
+
+    const playerTurnCheck = () => _playerTurn
     const scoreCheck = (patterns) => {
         patterns.map(function(pattern) {
             console.log(pattern())
@@ -145,6 +150,7 @@ const gameState = (() => {
             };
         });
     };
+
     return {
         calcPatterns,
         playerSwitch,
