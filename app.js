@@ -9,10 +9,19 @@
     });
 })();
 
+const playerFactory = (name, marker) => {
+    let wins = 0;
+    let myTurn = false;
+    return {name, marker, wins, myTurn};
+};
+
+const playerOne = playerFactory('playerOne', 'X');
+const playerTwo = playerFactory('playerTwo', 'O');
+
 const gameBoard = (() => {
     const _markers = {
-        x: 'X',
-        o: 'O',
+        x: 'X', // update this to reference the player's choice of marker
+        o: 'O', // update this to reference the player's choice of marker
         xValue: 1,
         oValue: -1,
         current: '',
@@ -30,6 +39,7 @@ const gameBoard = (() => {
     };
 
     // object serves as key for placing marker on square and calls score check on intersecting patterns
+    // tl is top left, tc is top center, etc...
     const _markerLocations = {
         tl: (value) => {
             _layout[0][0] = value;
@@ -98,7 +108,7 @@ const gameBoard = (() => {
             gameState.scoreCheck([
                 gameState.calcPatterns.bottomRow,
                 gameState.calcPatterns.rightCol,
-                gameState.calcPatterns.rtlDiag
+                gameState.calcPatterns.ltrDiag
             ]);
         }
     };
@@ -111,8 +121,9 @@ const gameBoard = (() => {
             _markers.current = _markers.o;
             _markers.currentValue = _markers.oValue;
         }
-        _markerLocations[location](_markers.currentValue); // updates value of chosen location
-        gameState.playerSwitch(gameState.playerTurnCheck());
+        _markerLocations[location](_markers.currentValue); // updates value of board location
+        document.getElementById(location).innerText = _markers.current; // adds current marker to board location
+        gameState.playerSwitch(gameState.playerTurnCheck()); // switches to opposite player
         _logger();
     };
 
@@ -126,8 +137,27 @@ const gameBoard = (() => {
 
 const gameState = (() => {
     let _playerTurn = 'playerOne';
-    const _gameOver = (player) => player === 'playerOne' ? alert('playerOne Wins!') : alert('playerTwo Wins!')
-    const playerSwitch = (player) => player === 'playerOne' ? _playerTurn = 'playerTwo' : _playerTurn = 'playerOne';
+    let _currentTurn = 1;
+    const _gameOver = (player) => {
+        if (player != 'cat') {
+            player === 'playerOne' ? alert('playerOne Wins!') : alert('playerTwo Wins!');
+        } else {
+            alert("Cat's Game!")
+        };
+    };
+    const playerSwitch = (player) => {
+        if (player === 'playerOne') {
+            _playerTurn = 'playerTwo';
+            playerOne.myTurn = false;
+            playerTwo.myTurn = true;
+        } else {
+            _playerTurn = 'playerOne';
+            playerOne.myTurn = true;
+            playerTwo.myTurn = false;
+        }
+        _currentTurn += 1;
+        console.log(_currentTurn)
+    };
 
     // object calculates patterns on board for scoreCheck function
     const calcPatterns = {
@@ -144,12 +174,14 @@ const gameState = (() => {
     const playerTurnCheck = () => _playerTurn
     const scoreCheck = (patterns) => {
         patterns.map(function(pattern) {
-            console.log(pattern())
-            if (pattern() === 3 || pattern() === -3) {
-                _gameOver(_playerTurn);
+                if (pattern() === 3 || pattern() === -3) {
+                    _gameOver(_playerTurn)
             };
         });
-    };
+        if (_currentTurn === 9) {
+            _gameOver('cat');
+        }
+    }; 
 
     return {
         calcPatterns,
