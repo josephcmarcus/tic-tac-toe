@@ -1,7 +1,7 @@
 (() => {
     const container = document.getElementById('container');
     container.addEventListener('click', (event) => {
-        if (event.target.className != 'box') {
+        if (event.target.className != 'box' || gameState.activeGameCheck() === false) {
             return;
         } else {
             gameBoard.addMarker(event.target.id);
@@ -138,6 +138,7 @@ const gameBoard = (() => {
 const gameState = (() => {
     let _playerTurn = 'playerOne';
     let _currentTurn = 1;
+    let _activeGame = true;
     const _gameOver = (player) => {
         if (player != 'cat') {
             player === 'playerOne' ? alert('playerOne Wins!') : alert('playerTwo Wins!');
@@ -145,6 +146,7 @@ const gameState = (() => {
             alert("Cat's Game!")
         };
     };
+
     const playerSwitch = (player) => {
         if (player === 'playerOne') {
             _playerTurn = 'playerTwo';
@@ -171,7 +173,8 @@ const gameState = (() => {
         rtlDiag: () => gameBoard.layoutCheck()[0][2] + gameBoard.layoutCheck()[1][1] + gameBoard.layoutCheck()[2][0]
     };
 
-    const playerTurnCheck = () => _playerTurn
+    const activeGameCheck = () => _activeGame;
+    const playerTurnCheck = () => _playerTurn;
     const scoreCheck = (patterns) => {
         patterns.map(function(pattern) {
                 if (pattern() === 3 || pattern() === -3) {
@@ -184,6 +187,7 @@ const gameState = (() => {
     }; 
 
     return {
+        activeGameCheck,
         calcPatterns,
         playerSwitch,
         playerTurnCheck,
