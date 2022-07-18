@@ -1,7 +1,8 @@
 (() => {
     const container = document.getElementById('container');
     container.addEventListener('click', (event) => {
-        if (event.target.className != 'box' || gameState.activeGameCheck() === false) {
+        if (event.target.className != 'box' || gameState.activeGameCheck() === false || 
+        document.getElementById(event.target.id).innerText != '') {
             return;
         } else {
             gameBoard.addMarker(event.target.id);
@@ -9,10 +10,10 @@
     });
 })();
 
-const playerFactory = (name, marker) => {
+const playerFactory = (name) => {
     let wins = 0;
     let myTurn = false;
-    return {name, marker, wins, myTurn};
+    return {name, wins, myTurn};
 };
 
 const playerOne = playerFactory('playerOne', 'X');
@@ -20,8 +21,8 @@ const playerTwo = playerFactory('playerTwo', 'O');
 
 const gameBoard = (() => {
     const _markers = {
-        x: 'X', // update this to reference the player's choice of marker
-        o: 'O', // update this to reference the player's choice of marker
+        x: 'X',
+        o: 'O',
         xValue: 1,
         oValue: -1,
         current: '',
