@@ -1,30 +1,27 @@
 (() => {
-    const container = document.getElementById('container');
+    const container = document.getElementById('main-container');
     container.addEventListener('click', (event) => {
         if (event.target.className != 'box' || gameState.activeGameCheck() === false || 
         document.getElementById(event.target.id).innerText != '') {
             return;
         } else {
             gameBoard.addMarker(event.target.id);
-        };
+        }
     });
 })();
 
-const playerFactory = (name) => {
-    let wins = 0;
-    let myTurn = false;
-    return {name, wins, myTurn};
+const playerFactory = (name, marker) => {
+    return {name, marker};
 };
 
 const playerOne = playerFactory('playerOne', 'X');
 const playerTwo = playerFactory('playerTwo', 'O');
 
 const gameBoard = (() => {
+    const _boxes = document.getElementsByClassName('box');
     const _markers = {
-        x: 'X',
-        o: 'O',
-        xValue: 1,
-        oValue: -1,
+        playerOneValue: 1,
+        playerTwoValue: -1,
         current: '',
         currentValue: ''
     };
@@ -114,13 +111,13 @@ const gameBoard = (() => {
         }
     };
 
-    const addMarker = function(location) {
+    const addMarker = (location) => {
         if (gameState.playerTurnCheck() === 'playerOne') { // checks current player to assign correct mark
-            _markers.current = _markers.x;
-            _markers.currentValue = _markers.xValue;
+            _markers.current = playerOne.marker;
+            _markers.currentValue = _markers.playerOneValue;
         } else {
-            _markers.current = _markers.o;
-            _markers.currentValue = _markers.oValue;
+            _markers.current = playerTwo.marker;
+            _markers.currentValue = _markers.playerTwoValue;
         }
         _markerLocations[location](_markers.currentValue); // updates value of board location
         document.getElementById(location).innerText = _markers.current; // adds current marker to board location
@@ -128,11 +125,23 @@ const gameBoard = (() => {
         _logger();
     };
 
+    const resetBoard = () => {
+        _layout = [
+            [0, 0, 0],
+            [0, 0, 0],
+            [0, 0, 0],
+        ];
+        for (box of _boxes) {
+            box.innerText = '';
+        };
+    }
+ 
     const layoutCheck = () => _layout;
 
     return {
         addMarker,
         layoutCheck,
+        resetBoard
     };
 })();
 
@@ -142,21 +151,27 @@ const gameState = (() => {
     let _activeGame = true;
     const _gameOver = (player) => {
         if (player != 'cat') {
-            player === 'playerOne' ? alert('playerOne Wins!') : alert('playerTwo Wins!');
+            player === 'playerOne' ? _winnerDiv.innerText = 'X Wins!' : _winnerDiv.innerText = 'O Wins!';
         } else {
-            alert("Cat's Game!")
+            _winnerDiv.innerText = 'Tie Game'
         };
+        _currentTurnDiv.classList.add('hide');
+        _winnerDiv.classList.remove('hide');
+        _activeGame = false;
     };
+    const _currentTurnDiv = document.getElementById('current-turn');
+    const _winnerDiv = document.getElementById('winner');
+    document.getElementById('reset-game').addEventListener('click', function() {
+        resetGame();
+    });
 
     const playerSwitch = (player) => {
         if (player === 'playerOne') {
             _playerTurn = 'playerTwo';
-            playerOne.myTurn = false;
-            playerTwo.myTurn = true;
+            _currentTurnDiv.innerText = `O's Turn`;
         } else {
             _playerTurn = 'playerOne';
-            playerOne.myTurn = true;
-            playerTwo.myTurn = false;
+            _currentTurnDiv.innerText = `X's Turn`;
         }
         _currentTurn += 1;
         console.log(_currentTurn)
@@ -177,21 +192,33 @@ const gameState = (() => {
     const activeGameCheck = () => _activeGame;
     const playerTurnCheck = () => _playerTurn;
     const scoreCheck = (patterns) => {
-        patterns.map(function(pattern) {
+            patterns.map(function(pattern) {
+                if (_currentTurn === 9) {
+                    pattern() === 3 || pattern() === -3 ? _gameOver(_playerTurn) : _gameOver('cat');
+                    return;
+                };
                 if (pattern() === 3 || pattern() === -3) {
                     _gameOver(_playerTurn)
-            };
-        });
-        if (_currentTurn === 9) {
-            _gameOver('cat');
-        }
+                    return;
+                };
+            });
     }; 
+    const resetGame = () => {
+        _playerTurn = 'playerOne';
+        _winnerDiv.classList.add('hide');
+        _currentTurnDiv.classList.remove('hide');
+        _currentTurnDiv.innerText = `X's Turn`;
+        _currentTurn = 1;
+        gameBoard.resetBoard();
+        _activeGame = true;
+    }
 
     return {
         activeGameCheck,
         calcPatterns,
         playerSwitch,
         playerTurnCheck,
-        scoreCheck
+        resetGame,
+        scoreCheck,
     }
 })();
