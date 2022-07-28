@@ -10,16 +10,11 @@
     });
 })();
 
-const playerFactory = (name, marker) => {
-    return {name, marker};
-};
-
-const playerOne = playerFactory('playerOne', 'X');
-const playerTwo = playerFactory('playerTwo', 'O');
-
 const gameBoard = (() => {
     const _boxes = document.getElementsByClassName('box');
     const _markers = {
+        playerOneMarker: 'X',
+        playerTwoMarker: 'O',
         playerOneValue: 1,
         playerTwoValue: -1,
         current: '',
@@ -31,10 +26,6 @@ const gameBoard = (() => {
         [0, 0, 0],
         [0, 0, 0],
     ];
-
-    const _logger = () => {
-        console.table(_layout)
-    };
 
     // object serves as key for placing marker on square and calls score check on intersecting patterns
     // tl is top left, tc is top center, etc...
@@ -108,21 +99,20 @@ const gameBoard = (() => {
                 gameState.calcPatterns.rightCol,
                 gameState.calcPatterns.ltrDiag
             ]);
-        }
+        }   
     };
 
     const addMarker = (location) => {
         if (gameState.playerTurnCheck() === 'playerOne') { // checks current player to assign correct mark
-            _markers.current = playerOne.marker;
+            _markers.current = _markers.playerOneMarker;
             _markers.currentValue = _markers.playerOneValue;
         } else {
-            _markers.current = playerTwo.marker;
+            _markers.current = _markers.playerTwoMarker;
             _markers.currentValue = _markers.playerTwoValue;
         }
         _markerLocations[location](_markers.currentValue); // updates value of board location
         document.getElementById(location).innerText = _markers.current; // adds current marker to board location
         gameState.playerSwitch(gameState.playerTurnCheck()); // switches to opposite player
-        _logger();
     };
 
     const resetBoard = () => {
@@ -146,9 +136,16 @@ const gameBoard = (() => {
 })();
 
 const gameState = (() => {
-    let _playerTurn = 'playerOne';
-    let _currentTurn = 1;
+    const _currentTurnDiv = document.getElementById('current-turn');
+    const _winnerDiv = document.getElementById('winner');
+    document.getElementById('reset-game').addEventListener('click', function() {
+        resetGame();
+    });
+
     let _activeGame = true;
+    let _currentTurn = 1;
+    let _playerTurn = 'playerOne';
+
     const _gameOver = (player) => {
         if (player != 'cat') {
             player === 'playerOne' ? _winnerDiv.innerText = 'X Wins!' : _winnerDiv.innerText = 'O Wins!';
@@ -159,11 +156,9 @@ const gameState = (() => {
         _winnerDiv.classList.remove('hide');
         _activeGame = false;
     };
-    const _currentTurnDiv = document.getElementById('current-turn');
-    const _winnerDiv = document.getElementById('winner');
-    document.getElementById('reset-game').addEventListener('click', function() {
-        resetGame();
-    });
+
+    const activeGameCheck = () => _activeGame;
+    const playerTurnCheck = () => _playerTurn;
 
     const playerSwitch = (player) => {
         if (player === 'playerOne') {
@@ -174,10 +169,9 @@ const gameState = (() => {
             _currentTurnDiv.innerText = `X's Turn`;
         }
         _currentTurn += 1;
-        console.log(_currentTurn)
     };
 
-    // object calculates patterns on board for scoreCheck function
+    // calculates patterns on board for scoreCheck function
     const calcPatterns = {
         topRow: () => gameBoard.layoutCheck()[0].reduce((pre, curr) => pre + curr, 0), 
         middleRow: () => gameBoard.layoutCheck()[1].reduce((pre, curr) => pre + curr, 0),
@@ -189,20 +183,19 @@ const gameState = (() => {
         rtlDiag: () => gameBoard.layoutCheck()[0][2] + gameBoard.layoutCheck()[1][1] + gameBoard.layoutCheck()[2][0]
     };
 
-    const activeGameCheck = () => _activeGame;
-    const playerTurnCheck = () => _playerTurn;
     const scoreCheck = (patterns) => {
-            patterns.map(function(pattern) {
-                if (_currentTurn === 9) {
-                    pattern() === 3 || pattern() === -3 ? _gameOver(_playerTurn) : _gameOver('cat');
-                    return;
-                };
-                if (pattern() === 3 || pattern() === -3) {
-                    _gameOver(_playerTurn)
-                    return;
-                };
-            });
-    }; 
+        patterns.map(function(pattern) {
+            if (_currentTurn === 9) {
+                pattern() === 3 || pattern() === -3 ? _gameOver(_playerTurn) : _gameOver('cat');
+                return;
+            };
+            if (pattern() === 3 || pattern() === -3) {
+                _gameOver(_playerTurn)
+                return;
+            };
+        });
+}; 
+
     const resetGame = () => {
         _playerTurn = 'playerOne';
         _winnerDiv.classList.add('hide');
