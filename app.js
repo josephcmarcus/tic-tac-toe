@@ -50,7 +50,7 @@ const gameBoard = (() => {
             gameState.scoreCheck([
                 gameState.calcPatterns.topRow,
                 gameState.calcPatterns.rightCol,
-                gameState.calcPatterns.ltrDiag
+                gameState.calcPatterns.rtlDiag
             ]);
         },
         ml: (value) => {
@@ -138,6 +138,7 @@ const gameBoard = (() => {
 const gameState = (() => {
     const _currentTurnDiv = document.getElementById('current-turn');
     const _winnerDiv = document.getElementById('winner');
+
     document.getElementById('reset-game').addEventListener('click', function() {
         resetGame();
     });
@@ -147,7 +148,7 @@ const gameState = (() => {
     let _playerTurn = 'playerOne';
 
     const _gameOver = (player) => {
-        if (player != 'cat') {
+        if (player != 'tie') {
             player === 'playerOne' ? _winnerDiv.innerText = 'X Wins!' : _winnerDiv.innerText = 'O Wins!';
         } else {
             _winnerDiv.innerText = 'Tie Game'
@@ -186,7 +187,7 @@ const gameState = (() => {
     const scoreCheck = (patterns) => {
         patterns.map(function(pattern) {
             if (_currentTurn === 9) {
-                pattern() === 3 || pattern() === -3 ? _gameOver(_playerTurn) : _gameOver('cat');
+                pattern() === 3 || pattern() === -3 ? _gameOver(_playerTurn) : _gameOver('tie');
                 return;
             };
             if (pattern() === 3 || pattern() === -3) {
