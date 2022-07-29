@@ -3,7 +3,8 @@ body {
     margin: 0;
     font-family: 'Raleway', sans-serif;
     font-size: 2rem;
-    color: grey;
+    color: #E6E6EA;
+    background-color: #2AB7CA;
 }
 
 #main-container {
@@ -28,7 +29,7 @@ body {
 }
 
 #winner {
-    color: rgb(0, 161, 0);
+    color: #4a4859;
 }
 
 #game {
@@ -42,13 +43,13 @@ body {
 }
 
 #tc, #mc, #bc {
-    border-left: 5px solid rgb(155, 155, 155);
-    border-right: 5px solid rgb(155, 155, 155);
+    border-left: 5px solid #E6E6EA;
+    border-right: 5px solid #E6E6EA;
 }
 
 #ml, #mc, #mr {
-    border-top: 5px solid rgb(155, 155, 155);
-    border-bottom: 5px solid rgb(155, 155, 155);
+    border-top: 5px solid #E6E6EA;
+    border-bottom: 5px solid #E6E6EA;
 }
 
 .box {
@@ -62,13 +63,16 @@ body {
 #reset-game {
     padding: 1rem 2rem;
     background: none;
-    border: 3px solid grey;
+    border: 3px solid #E6E6EA;
     text-transform: uppercase;
     font-weight: bold;
-    color: grey;
+    color: #E6E6EA;
 }
 
 #reset-game:hover {
-    background-color: black;
-    color: white;
+    background-color: #186c77;
+}
+
+#reset-game:active {
+    background-color: #114d55;
 }
