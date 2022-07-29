@@ -153,9 +153,9 @@ const gameState = (() => {
         } else {
             _winnerDiv.innerText = 'Tie Game'
         };
+        _activeGame = false;
         _currentTurnDiv.classList.add('hide');
         _winnerDiv.classList.remove('hide');
-        _activeGame = false;
     };
 
     const activeGameCheck = () => _activeGame;
@@ -186,13 +186,11 @@ const gameState = (() => {
 
     const scoreCheck = (patterns) => {
         patterns.map(function(pattern) {
-            if (_currentTurn === 9) {
-                pattern() === 3 || pattern() === -3 ? _gameOver(_playerTurn) : _gameOver('tie');
-                return;
+            if (_currentTurn === 9 && _activeGame === true) {
+                return pattern() === 3 || pattern() === -3 ? _gameOver(_playerTurn) : _gameOver('tie');
             };
             if (pattern() === 3 || pattern() === -3) {
-                _gameOver(_playerTurn)
-                return;
+                return _gameOver(_playerTurn)
             };
         });
 }; 
